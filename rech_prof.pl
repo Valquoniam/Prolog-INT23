@@ -65,7 +65,8 @@ rprof_ss_cycle(Etat,Solution):-                                      /* On fait 
 
 /*On raisonne de la meme façon : */
 
-rprof_bornee_aux(Etat,[Etat],_,_):- 
+rprof_bornee_aux(Etat,[Etat],_,ProfMax):- 
+	ProfMax>0,
 	but(Etat).
 rprof_bornee_aux(Etat,[Etat|L],DejaDev,ProfMax):-
 	ProfMax>0,
@@ -85,6 +86,20 @@ rprof_bornee(Etat,Solution,ProfMax):-
 *     à profondeur incrémentale.
 ******************************************************************************/
 
+/*On raisonne de la meme façon : */
+
+rprof_incr_aux(Etat,Solution,Prof,_) :-                    
+	rprof_bornee(Etat,Solution,Prof).              /* On applique rprof_bornée à chaque itération */
+rprof_incr_aux(Etat,Solution,Prof,ProfMax) :-
+	Prof < ProfMax,
+	rprof_incr_aux(Etat,Solution,Prof+1,ProfMax).  /* On utilise un procédé récursif pour répéter les itérations */
+
+rprof_incr(Etat,Solution,ProfMax) :-
+	rprof_incr_aux(Etat,Solution,0,ProfMax).       /* On part de la profondeur nulle */
 	
+
+
+
+
 
 
