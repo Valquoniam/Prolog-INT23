@@ -165,7 +165,10 @@ but(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV)):-
 ******************************************************************************/
 
 
-/*Essai de réalisation de la fonction etatConnexe : randomOperateurs marche mais pas etatConnexe_aux et je ne trouve pas pourquoi */
+/*****************************************************************************/
+
+/* On code ici la fonction pour "mélanger" le taquin depuis l'état final. */
+/* Ceci est de l'aléatoire "fait main" pour pouvoir tester nos algos de résolution */
 
 randomOperateurs(Etat,0,NEtat):-
 	operateur(up,Etat,NEtat).
@@ -178,76 +181,23 @@ randomOperateurs(Etat,2,NEtat):-
 
 randomOperateurs(Etat,3,NEtat):-
 	operateur(left,Etat,NEtat).
-
-etatConnexe_aux(0,_,_).		
-
-etatConnexe_aux(NbIterations,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),NNEtat):-
-	memberchk(CV,[6,7,10,11]),                             /* Quand on est sur les cases du milieu */                                  
-	!,
-	K is random(3),
-	randomOperateurs(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),K,NEtat),
-	NNbIterations is NbIterations-1,
-	etatConnexe_aux(NNbIterations,NEtat,NNEtat).
-
-etatConnexe_aux(NbIterations,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),NNEtat):-
-	memberchk(CV,[8,12]),                                 /*Quand on est au milieu à droite */
-	!,
-	random_member(K,[0,1,3]),
-	randomOperateurs(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),K,NEtat),
-	NNbIterations is NbIterations-1,
-	etatConnexe_aux(NNbIterations,NEtat,NNEtat).
-
-etatConnexe_aux(NbIterations,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),NNEtat):-
-	memberchk(CV,[5,9]),                                 /*Quand on est au milieu à gauche */
-	!,
-	K is random(2),
-	randomOperateurs(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),K,NEtat),
-	NNbIterations is NbIterations-1,
-	etatConnexe_aux(NNbIterations,NEtat,NNEtat).
-	
-etatConnexe_aux(NbIterations,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),NNEtat):-
-	memberchk(CV,[2,3]),                                 /*Quand on est au milieu en haut ou au milieu en bas (simplifié) */
-	!,
-	random(2,3,K),
-	randomOperateurs(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),K,NEtat),
-	NNbIterations is NbIterations-1,
-	etatConnexe_aux(NNbIterations,NEtat,NNEtat).
-
-etatConnexe_aux(NbIterations,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),NNEtat):-
-	CV == 16,                                 /*Quand on est dans le coin en bas à droite */
-	!,
-	random_member(K,[0,3]),
-	randomOperateurs(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),K,NEtat),
-	NNbIterations is NbIterations-1,
-	etatConnexe_aux(NNbIterations,NEtat,NNEtat).
-	
-etatConnexe_aux(NbIterations,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),NNEtat):-
-	CV == 4,                                 /*Quand on est dans le coin en haut à droite */
-	!,
-	random_member(K,[1,3]),
-	randomOperateurs(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),K,NEtat),
-	NNbIterations is NbIterations-1,
-	etatConnexe_aux(NNbIterations,NEtat,NNEtat).
-
-etatConnexe_aux(NbIterations,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),NNEtat):-
-	CV == 13,                                 /*Quand on est dans le coin en bas à gauche */
-	!,
-	random_member(K,[0,2]),
-	randomOperateurs(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),K,NEtat),
-	NNbIterations is NbIterations-1,
-	etatConnexe_aux(NNbIterations,NEtat,NNEtat).
-
-etatConnexe_aux(NbIterations,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),NNEtat):-
-	CV == 1,                                 /*Quand on est dans le coin en haut à gauche */
-	!,
-	random_member(K,[1,2]),
-	randomOperateurs(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),K,NEtat),
-	NNbIterations is NbIterations-1,
-	etatConnexe_aux(NNbIterations,NEtat,NNEtat).
-	
-etatConnexe(NbIterations,NEtat):-
-	etatConnexe_aux(NbIterations,et(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,16),NEtat).
 		
+etatConnexe(N4Etat):-
+	operateur(up,et(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,16),NEtat), /* On monte la case vide */
+	operateur(left,NEtat,NNEtat),                                     /* On la déplace à gauche */
+	random_member(K,[0,1,2,3]),                                      
+	random_member(L,[0,3]),                                           
+	randomOperateurs(NNEtat,K,NNNEtat),                               /* On la déplace dans un sens aléatoire */
+	randomOperateurs(NNNEtat,L,N4Etat).                               /* On la déplace soit à gauche, soit en haut : 2 seuls sens qui sont applicables. */
+
+/* On a alors 8 états possibles : suffisant pour les tests */
+
+/**** Fonction pour résoludre le taquin depuis l'état connexe ***/
+/* resolTaquin(?Solution,NNA,NND) mélange le taquin pseudo-aléatoirement, puis résoud le problème à partir de cet état mélangé. */
+
+resolTaquin(Solution,NNA,NND):-
+	etatConnexe(Etat),
+	rech_larg(Etat,Solution,NNA,NND).		
 
 	
 	

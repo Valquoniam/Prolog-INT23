@@ -52,7 +52,7 @@
 
 
 /*****************************************************************************
-* 3) Le codage de notrealgorithme de recherche en profondeur nécessite alors
+* 3) Le codage de notre algorithme de recherche en largeur nécessite alors
 * de construire le graphe de recherche et sa frontière.
 * une façon simple de représenter la structure de ce graphe est de 
 * représenter chaque noeud par une structure de la forme : 
@@ -88,39 +88,46 @@
 ******************************************************************************/
 
 /* fonction de reconstruction du chemin solution. 
-   path(+Noeud,?Solution) renvoie le chemin depuis Noeud jusqu'au noeud initial.*/
+   path(+Noeud,?Chemin,-NNA,-NND) renvoie le chemin depuis Noeud jusqu'au noeud initial.*/
+ 
+path(nd(Etat,0),[Etat]).                                      /* Cas où on est le noeud initial */
+path(nd(Etat,nd(X,Pere)),[Etat|NoeudSuivant]) :-              /* On ajoute le père dans le chemin solution sinon */
+     path(nd(X,Pere),NoeudSuivant).                           /* On repète le processus pour arriver à NoeudSuivant = 0 */
 
-path(nd(E,0),[E]).
-path(nd(E,nd(X,Pere)),[E|NextNoeud]) :-
-     path(nd(X,Pere),NextNoeud).
+/*****************************************************************************/
 
 /* La fonction de recherche à la frontière. */
+/* rech_larg_aux(+Frontière,-NoeudSolution,+DejaDev,-NNA,-NND) correspond à l'algorithme de recherche en largeur sans cycle, on fera un appel initial ensuite.  */
 
-rech_larg_front([nd(E,PE)|_],nd(E,PE),_):-
-     but(E),
-     !.
-rech_larg_front([nd(E,PE)|F],Sol,V):-
-     \+ memberchk(E,V),
-     findall(nd(NE, nd(E, PE)), operateur(_, E, NE), NF),
-     append(F,NF,NNF),                                         /* On ajoute à la fin de la frontière */
-     rech_larg_front(NNF,Sol,[E|V]).
+rech_larg_aux([nd(Etat,Père)|_],nd(Etat,Père),_,NNA,NND):-
+	NNA is 0,
+	NND is 0,                                                                              /* Si le 1er noeud de la frontière (celui qui est étudié) est le noeud solution, on a atteint le but */
+	but(Etat).
+	
+rech_larg_aux([nd(Etat,Père)|ResteFrontière],NoeudSolution,DejaDev,NNA,NND):-
+	\+ memberchk(Etat,DejaDev),                                                            /* On vérifie que le noeud étudié ne soit pas déjà visité */
+	findall(nd(NEtat, nd(Etat, Père)), operateur(_, Etat, NEtat), NoeudsSuivants),         /* On regarde tous les prochains noeuds, en appliquant tous les opérateurs possibles au noeud actuel */
+	length(NoeudsSuivants,L),
+	append(ResteFrontière,NoeudsSuivants,NFrontière),                                      /* On actualise la frontière en rajoutant ces nouveaux éléments */
+	rech_larg_aux(NFrontière,NoeudSolution,[Etat|DejaDev],NNA2,NND2),                      /* On répète le processus avec les nouveaux Frontière et DejaDev  */	
+	NNA is NNA2+L,                                                                         /* On actualise le nombre de noeuds apparus */
+	NND is NND2+1.                                                                         /* On actualise le nombre de noeuds développé */
+                    
+	
+rech_larg_aux([_|Frontière],Solution,DejaDev,NNA,NND):-                                        /* Cas important : si on a pas de noeud en début de frontière : On ignore et on passe au noeud suivant */
+     rech_larg_aux(Frontière,Solution,DejaDev,NNA,NND).                                        /* Sans ce cas, on a tout le temps "false" */
 
-rech_larg_front([_|Front],Sol,V):-
-     rech_larg_front(Front,Sol,V).
+/******************************************************************************************************************/
 
 /* Le prédicat principal.
-   rech_larg(+Etat,?Solution) renvoie le chemin Solution vers l'état terminal depuis l'état Etat.
+   rech_larg(+Etat,-CheminSolution,-NNA,-NND) renvoie le chemin Solution vers l'état terminal depuis l'état Etat.
 */
 
-rech_larg(E, [E|[]]):-
-     but(E),
-     !.
-rech_larg(E,S):-
-     findall(nd(NE,nd(E,0)), operateur(_,E,NE), F), 
-     rech_larg_front(F, PS,[E]),
-     path(PS,PPS),
-     reverse(PPS,S). /*La fonction path ne inversant pas la suite de noeuds étant construite le
-                       plus récent en premier, il faut inverser la liste des états pour avoir les coups à jouer
-                       dans le ordre. */
+	
+rech_larg(Etat,CheminSolution,NNA,NND):-           
+     rech_larg_aux([nd(Etat,0)], NoeudSolution,[],NNA,NND),          /* On applique la recherche avec comme frontière le noeud initial */
+     path(NoeudSolution,CheminSolutionReverse),                      /* Une fois la solution trouvée, on remonte le chemin
+     reverse(CheminSolutionReverse,CheminSolution).                  /* Path renvoie le chemin dans le mauvais ordre : il faut inverser. */
+                       
 
 
