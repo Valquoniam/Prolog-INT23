@@ -126,7 +126,7 @@ rech_larg_aux([_|Frontière],Solution,DejaDev,NNA,NND):-                        
 	
 rech_larg(Etat,CheminSolution,NNA,NND):-           
      rech_larg_aux([nd(Etat,0)], NoeudSolution,[],NNA,NND),          /* On applique la recherche avec comme frontière le noeud initial */
-     path(NoeudSolution,CheminSolutionReverse),                      /* Une fois la solution trouvée, on remonte le chemin
+     path(NoeudSolution,CheminSolutionReverse),                      /* Une fois la solution trouvée, on remonte le chemin */
      reverse(CheminSolutionReverse,CheminSolution).                  /* Path renvoie le chemin dans le mauvais ordre : il faut inverser. */
                        
 

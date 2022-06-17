@@ -96,7 +96,7 @@ remplace([H|T], I, X, [H|R]):-
 
 /********************************************************************/
 
-operateur(up,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat):-               /*On monte la case vide */
+operateur(up,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat,Cout):-               /*On monte la case vide */
 	cons_etat_taquin(Matrice,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV)),  /* On travaille sur une matrice par souci de simplicité */
 	CV>0,
 	CV>4,                                                                              /* Il faut que la case vide soit au moins sur la 2ème ligne */
@@ -104,10 +104,11 @@ operateur(up,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat):-    
 	nth1(Ncv,Matrice,FutureCaseVide),                                                  /* On note FutureCaseVide la valeur de la case au dessus de la case vide */
 	remplace(Matrice,CV-1,FutureCaseVide,NMatrice),                                    /* On inverse cette valeur avec le 0 de la case vide : Attention, on compte à partir de 0*/
 	remplace(NMatrice,Ncv-1,0,NNMatrice),
+	Cout is 0,
 	cons_etat_taquin(NNMatrice,Netat).	                                             /* On renvoie le nouvel état actualisé */
 		
 
-operateur(down,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat):-             /*On descend la case vide */
+operateur(down,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat,Cout):-             /*On descend la case vide */
 	cons_etat_taquin(Matrice,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV)),  
 	CV>0,
 	CV<13,                                                                             /* Il faut que la case vide soit avant la dernière ligne */
@@ -115,9 +116,10 @@ operateur(down,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat):-  
 	nth1(Ncv,Matrice,FutureCaseVide),                                                  /* On note FutureCaseVide la valeur de la case en dessous de la case vide */
 	remplace(Matrice,CV-1,FutureCaseVide,NMatrice),                                    
 	remplace(NMatrice,Ncv-1,0,NNMatrice),
+	Cout is 0,
 	cons_etat_taquin(NNMatrice,Netat).	                                             
 		
-operateur(right,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat):-            /* On déplace la case vide à droite */
+operateur(right,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat,Cout):-            /* On déplace la case vide à droite */
 	cons_etat_taquin(Matrice,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV)),  
 	CV>0,
 	\+ CV mod 4 = 0,                                                                   /* Il faut que la case vide soit avant la dernière colonne */
@@ -125,9 +127,10 @@ operateur(right,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat):- 
 	nth1(Ncv,Matrice,FutureCaseVide),                                                  /* On note FutureCaseVide la valeur de la case à droite de la case vide */
 	remplace(Matrice,CV-1,FutureCaseVide,NMatrice),                                    
 	remplace(NMatrice,Ncv-1,0,NNMatrice),
+	Cout is 0,
 	cons_etat_taquin(NNMatrice,Netat).	                                             
 		
-operateur(left,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat):-              /* On déplace la case vide à gauche */
+operateur(left,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat,Cout):-              /* On déplace la case vide à gauche */
 	cons_etat_taquin(Matrice,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV)),  
 	CV>0,
 	\+ CV mod 4 = 1,                                                                    /* Il faut que la case vide soit au moins apres la premiere colonne */
@@ -135,6 +138,7 @@ operateur(left,et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV),Netat):-  
 	nth1(Ncv,Matrice,FutureCaseVide),                                                   /* On note FutureCaseVide la valeur de la case à gauche de la case vide */
 	remplace(Matrice,CV-1,FutureCaseVide,NMatrice),                                    
 	remplace(NMatrice,Ncv-1,0,NNMatrice),
+	Cout is 0,
 	cons_etat_taquin(NNMatrice,Netat).	
 	
 /*****************************************************************************
@@ -171,20 +175,20 @@ but(et(A, B, C, D, E, F, G, H, I, K ,L, M, N, O, P, Q, CV)):-
 /* Ceci est de l'aléatoire "fait main" pour pouvoir tester nos algos de résolution */
 
 randomOperateurs(Etat,0,NEtat):-
-	operateur(up,Etat,NEtat).
+	operateur(up,Etat,NEtat,0).
 
 randomOperateurs(Etat,1,NEtat):-
-	operateur(down,Etat,NEtat).
+	operateur(down,Etat,NEtat,0).
 	
 randomOperateurs(Etat,2,NEtat):-
-	operateur(right,Etat,NEtat).
+	operateur(right,Etat,NEtat,0).
 
 randomOperateurs(Etat,3,NEtat):-
-	operateur(left,Etat,NEtat).
+	operateur(left,Etat,NEtat,0).
 		
 etatConnexe(N4Etat):-
-	operateur(up,et(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,16),NEtat), /* On monte la case vide */
-	operateur(left,NEtat,NNEtat),                                     /* On la déplace à gauche */
+	operateur(up,et(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0,16),NEtat,0), /* On monte la case vide */
+	operateur(left,NEtat,NNEtat,0),                                     /* On la déplace à gauche */
 	random_member(K,[0,1,2,3]),                                      
 	random_member(L,[0,3]),                                           
 	randomOperateurs(NNEtat,K,NNNEtat),                               /* On la déplace dans un sens aléatoire */
@@ -192,12 +196,30 @@ etatConnexe(N4Etat):-
 
 /* On a alors 8 états possibles : suffisant pour les tests */
 
-/**** Fonction pour résoludre le taquin depuis l'état connexe ***/
-/* resolTaquin(?Solution,NNA,NND) mélange le taquin pseudo-aléatoirement, puis résoud le problème à partir de cet état mélangé. */
+/*****************Codage des heuristiques et de la fonction de test de l'algo sur le taquin ***********************/
 
+/************************* Codage de h1 : Nombre de cases mal placées ******************************************/
+ressembl([],[],0).
+ressembl([X|Liste1],[L|Liste2],Nb):-
+	X==L,
+	!,
+	ressembl(Liste1,Liste2,NNb),
+	Nb is NNb+1.
+ressembl([_|Liste1],[_|Liste2],Nb):-
+	ressembl(Liste1,Liste2,Nb).
+		
+h(h1,EtatTaquin,ValeurH):-
+	cons_etat_taquin(Matrice, EtatTaquin),
+	ressembl([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,0],Matrice,Valeur),
+	ValeurH is 16-Valeur.
+	
 resolTaquin(Solution,NNA,NND):-
 	etatConnexe(Etat),
-	rech_larg(Etat,Solution,NNA,NND).		
+	rech_A(Etat,Solution,h1,NNA,NND).
+	
+/**************************************************** Commentaires **********************************************/	
+	
+
 
 	
 	
